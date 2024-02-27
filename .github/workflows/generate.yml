@@ -1,0 +1,25 @@
+name: Generate
+on:
+  push:
+    branches: ["master"]
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Swift Generate
+      run: swift run --package-path ./scripts/GeneratorKit GeneratorKit --path "."
+
+    - name: Commit
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "github-actions"
+        git add . -A
+        git commit --allow-empty -a -m "Regenerate help.json"
+
+    - name: Push
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
